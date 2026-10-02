@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elora International School</title>
+  
+  <!-- Butter-Smooth Scroll Physics Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: #f5f8fc;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 18px 8%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, .55);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      transition: all 0.4s ease;
+    }
+
+    header.scrolled {
+      background: rgba(8, 28, 45, .95);
+      padding: 12px 8%;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .3);
+    }
+
+    .logo {
+      font-size: 28px;
+      font-weight: bold;
+      color: #fff;
+      text-decoration: none;
+      transition: transform 0.3s ease;
+      display: inline-block;
+    }
+
+    .logo:hover {
+      transform: scale(1.03);
+    }
+
+    .logo span {
+      color: #ffb703;
+    }
+
+    /* Nav Links Transform & Animations */
+    nav a {
+      display: inline-block;
+      text-decoration: none;
+      color: #fff;
+      margin-left: 28px;
+      font-weight: 500;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), color 0.3s ease;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      width: 0%;
+      height: 2px;
+      bottom: -4px;
+      left: 0;
+      background-color: #ffb703;
+      transition: width 0.3s ease;
+      border-radius: 2px;
+    }
+
+    nav a:hover {
+      color: #ffb703;
+      transform: translateY(-3px) scale(1.05);
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    /* Hero Slider Styles (UPDATED FOR SLIDING ANIMATION) */
+    .hero {
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .slider-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* Slide Position Base Class */
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transform: translateX(100%); /* Right side pe wait karegi */
+      transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1), opacity 0.8s ease;
+      will-change: transform, opacity;
+    }
+
+    /* Active Slide (Screen par rahegi) */
+    .slide.active {
+      opacity: 1;
+      transform: translateX(0%);
+      z-index: 2;
+    }
+
+    /* Previous Slide (Left mein nikal jayegi) */
+    .slide.slide-left {
+      opacity: 0;
+      transform: translateX(-100%);
+      z-index: 1;
+    }
+
+    /* Next Slide (Right se aayegi) */
+    .slide.slide-right {
+      opacity: 0;
+      transform: translateX(100%);
+      z-index: 1;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.65));
+    }
+
+    /* Slider Controls (Buttons) */
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0, 0, 0, 0.5);
+      color: #ffb703;
+      border: 2px solid #ffb703;
+      font-size: 24px;
+      padding: 12px 18px;
+      cursor: pointer;
+      z-index: 10;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .slider-btn:hover {
+      background: #ffb703;
+      color: #000;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .prev-btn {
+      left: 25px;
+    }
+
+    .next-btn {
+      right: 25px;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 3;
+      color: #fff;
+      max-width: 800px;
+      padding: 20px;
+      animation: heroIn 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+    }
+
+    @keyframes heroIn {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero h1 {
+      font-size: 60px;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 20px;
+      line-height: 1.7;
+      margin-bottom: 35px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 15px 35px;
+      background: #ffb703;
+      color: #000;
+      font-weight: bold;
+      text-decoration: none;
+      border-radius: 40px;
+      transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), background-color 0.3s ease, box-shadow 0.3s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 183, 3, 0.3);
+    }
+
+    .btn:hover {
+      transform: translateY(-5px) scale(1.03);
+      background: #fff;
+      box-shadow: 0 8px 25px rgba(255, 255, 255, 0.4);
+    }
+
+    .btn:active {
+      transform: translateY(-2px) scale(0.98);
+    }
+
+    section {
+      padding: 80px 8%;
+      scroll-margin-top: 70px;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 38px;
+      margin-bottom: 50px;
+      color: #0d3b66;
+    }
+
+    /* Scroll Reveal Transitions */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      will-change: opacity, transform;
+    }
+
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .about {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 40px;
+      align-items: center;
+    }
+
+    .about p {
+      line-height: 1.8;
+      font-size: 17px;
+    }
+
+    #extraText {
+      max-height: 0;
+      opacity: 0;
+      overflow: hidden;
+      transition: max-height 0.6s ease, opacity 0.5s ease;
+    }
+
+    #extraText.show {
+      max-height: 400px;
+      opacity: 1;
+      margin-top: 15px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 25px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-12px) scale(1.02);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, .12);
+    }
+
+    .card h3 {
+      margin: 20px 0;
+      color: #0d3b66;
+    }
+
+    .stats {
+      background: #0d3b66;
+      color: #fff;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      text-align: center;
+      border-radius: 20px;
+      margin: 0 8%;
+      padding: 40px 20px;
+    }
+
+    .stat h2 {
+      font-size: 48px;
+      margin-bottom: 10px;
+      color: #ffb703;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 15px;
+      transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.4s ease;
+    }
+
+    .gallery img:hover {
+      transform: scale(1.06) translateY(-5px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .cta {
+      background: linear-gradient(135deg, #0d3b66, #0066cc);
+      color: #fff;
+      text-align: center;
+      border-radius: 20px;
+      padding: 60px 30px;
+    }
+
+    .cta h2 {
+      font-size: 40px;
+      margin-bottom: 20px;
+    }
+
+    footer {
+      background: #081c2d;
+      color: #ddd;
+      text-align: center;
+      padding: 25px;
+      margin-top: 40px;
+    }
+
+    @media(max-width:768px) {
+      header {
+        padding: 15px 20px;
+        flex-direction: column;
+      }
+
+      nav {
+        margin-top: 15px;
+      }
+
+      nav a {
+        margin: 0 10px;
+      }
+
+      .hero h1 {
+        font-size: 38px;
+      }
+
+      .hero p {
+        font-size: 17px;
+      }
+
+      .title {
+        font-size: 30px;
+      }
+
+      .slider-btn {
+        padding: 8px 12px;
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header Section -->
+  <header id="navbar">
+    <a href="#hero" class="logo">Elora <span>School</span></a>
+    <nav>
+      <a href="#hero">Home</a>
+      <a href="#about">About</a>
+      <a href="#facilities">Facilities</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#contact">Apply Now</a>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero" class="hero">
+    <!-- Image Slider Container (5 Images) -->
+    <div class="slider-container">
+      <div class="slide active" style="background-image: url('School.jpeg');"></div>
+      <div class="slide" style="background-image: url('Class.jpeg');"></div>
+      <div class="slide" style="background-image: url('Activity.jpeg');"></div>
+      <div class="slide" style="background-image: url('Office.jpeg');"></div>
+      <div class="slide" style="background-image: url('Bus.png');"></div>
+    </div>
+
+    <!-- Left/Right Buttons -->
+    <button class="slider-btn prev-btn" id="prevBtn">&#10094;</button>
+    <button class="slider-btn next-btn" id="nextBtn">&#10095;</button>
+
+    <div class="hero-content">
+      <h1>Welcome To Elora International School</h1>
+      <p>Empowering young minds through academic excellence, innovation, leadership, creativity, sports and values that inspire lifelong success.</p>
+      <a href="#about" class="btn">Explore More</a>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="reveal">
+    <h2 class="title">About Our School</h2>
+    <div class="about">
+      <video src="Our School.mp4" muted loop autoplay height="600" width="550"></video>
+      <div>
+        <p>Elora International School provides world-class education with modern classrooms, experienced faculty, smart learning, digital labs, sports facilities and personality development programs.<br><br>Our mission is to prepare students to become confident, creative and responsible global citizens.</p>
+        
+        <div id="extraText">
+          <p>Since its establishment, our institution has been dedicated to providing quality education in a safe and supportive environment.<br><br>We offer a balanced curriculum that combines academic excellence with extracurricular activities including sports, cultural events, and robotics.</p>
+        </div>
+        <br>
+        <button id="toggleBtn" class="btn" onclick="toggleText()">Read more</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Facilities Section -->
+  <section id="facilities" class="reveal">
+    <h2 class="title">Why Choose Us</h2>
+    <div class="cards">
+      <div class="card">
+        <h3>📚 Smart Classrooms</h3>
+        <p>Interactive digital learning with modern teaching methods.</p>
+      </div>
+      <div class="card">
+        <h3>🏆 Sports Excellence</h3>
+        <p>Professional coaching and national-level sports facilities.</p>
+      </div>
+      <div class="card">
+        <h3>💻 Computer Labs</h3>
+        <p>Advanced technology labs for coding and innovation.</p>
+      </div>
+      <div class="card">
+        <h3>🎨 Creativity</h3>
+        <p>Music, dance, drama, robotics and art clubs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats reveal">
+    <div class="stat">
+      <h2 class="count" data-target="2500">0</h2>
+      <p>Students</p>
+    </div>
+    <div class="stat">
+      <h2 class="count" data-target="180">0</h2>
+      <p>Teachers</p>
+    </div>
+    <div class="stat">
+      <h2 class="count" data-target="40">0</h2>
+      <p>Labs & Activities</p>
+    </div>
+    <div class="stat">
+      <h2 class="count" data-target="100">0</h2>
+      <p>Success Rate %</p>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery" class="reveal">
+    <h2 class="title">Campus Gallery</h2>
+    <div class="gallery">
+      <img src="smart Class.jpeg" alt="Gallery 1">
+      <img src="Sport.jpeg" alt="Gallery 2">
+      <img src="Lab.jpeg" alt="Gallery 3">
+      <img src="library.jpeg" alt="Gallery 4">
+    </div>
+  </section>
+
+  <!-- Contact CTA Section -->
+  <section id="contact" class="reveal">
+    <div class="cta">
+      <h2>Admissions Open 2026-27</h2>
+      <p style="margin:20px 0;font-size:18px;">Join a vibrant learning community that nurtures excellence, innovation and leadership.</p>
+      <a href="form.html" class="btn">Apply Now</a>
+    </div>
+  </section>
+
+  <!-- Footer Section -->
+  <footer>
+    <h3>Elora International School</h3>
+    <p>📍 Indore, Madhya Pradesh</p>
+    <p>📞 +91 98765 43210</p>
+    <p>✉️ info@eloraschool.edu</p>
+    <br>
+    <p>© 2026 Elora International School. All Rights Reserved.</p>
+  </footer>
+
+  <!-- JavaScript Script -->
+  <script>
+    // Lenis Smooth Scroll Engine
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    // Smooth scroll integration with Lenis
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId && targetId !== '#') {
+          const targetElement = document.querySelector(targetId);
+          if (targetElement) {
+            lenis.scrollTo(targetElement);
+          }
+        }
+      });
+    });
+
+    // Horizontal Sliding Logic
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    let currentSlide = 0;
+    let slideInterval;
+
+    function changeSlide(direction) {
+      const oldSlide = slides[currentSlide];
+
+      if (direction === 'next') {
+        currentSlide = (currentSlide + 1) % slides.length;
+        oldSlide.className = 'slide slide-left'; // Left side slip ho jayegi
+        slides[currentSlide].className = 'slide active'; // Nayi slide right se aayegi
+      } else {
+        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+        oldSlide.className = 'slide slide-right'; // Right side slip ho jayegi
+        slides[currentSlide].className = 'slide active'; // Nayi slide left se aayegi
+      }
+    }
+
+    nextBtn.addEventListener('click', () => {
+      changeSlide('next');
+      resetTimer();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      changeSlide('prev');
+      resetTimer();
+    });
+
+    // Auto Sliding Timer (Har 3 Seconds mein)
+    function startTimer() {
+      slideInterval = setInterval(() => changeSlide('next'), 3000);
+    }
+
+    function resetTimer() {
+      clearInterval(slideInterval);
+      startTimer();
+    }
+
+    startTimer();
+
+    // Expandable Text Toggle
+    function toggleText() {
+      const extraText = document.getElementById("extraText");
+      const toggleBtn = document.getElementById("toggleBtn");
+      if (!extraText.classList.contains("show")) {
+        extraText.classList.add("show");
+        toggleBtn.innerText = "Read less";
+      } else {
+        extraText.classList.remove("show");
+        toggleBtn.innerText = "Read more";
+      }
+    }
+
+    // Scroll Reveal Observer
+    const revealElements = document.querySelectorAll(".reveal");
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("active");
+        }
+      });
+    }, { threshold: 0.15 });
+
+    revealElements.forEach(el => revealObserver.observe(el));
+
+    // Number Counter Animation
+    const counterSection = document.querySelector('.stats');
+    let animated = false;
+
+    const startCounter = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !animated) {
+          animated = true;
+          document.querySelectorAll(".count").forEach(counter => {
+            const update = () => {
+              const target = +counter.dataset.target;
+              const count = +counter.innerText;
+              const inc = target / 70;
+              if (count < target) {
+                counter.innerText = Math.ceil(count + inc);
+                setTimeout(update, 25);
+              } else {
+                counter.innerText = target;
+              }
+            };
+            update();
+          });
+        }
+      });
+    }, { threshold: 0.3 });
+
+    if (counterSection) startCounter.observe(counterSection);
+
+    // Navbar Scroll Transition
+    window.addEventListener('scroll', () => {
+      const navbar = document.getElementById('navbar');
+      if (window.scrollY > 50) {
+        navbar.classList.add('scrolled');
+      } else {
+        navbar.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>
